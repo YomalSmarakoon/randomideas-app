@@ -1,38 +1,38 @@
+import IdeasAPI from "../services/ideasApi";
+
 class IdeaList {
   constructor() {
     this._ideaListEl = document.querySelector("#idea-list");
-    this._ideas = [
-      {
-        id: 1,
-        text: "Idea 1",
-        tag: "Technology",
-        username: "TonyStark",
-        date: "2025-04-15",
-      },
-      {
-        id: 1,
-        text: "Idea 2",
-        tag: "Business",
-        username: "TonyStark",
-        date: "2025-04-15",
-      },
-    ];
+    this._ideas = [];
+    this.getIdeas();
+
     this._validTags = new Set();
-    this._validTags.add('technology');
-    this._validTags.add('software');
-    this._validTags.add('business');
-    this._validTags.add('education');
-    this._validTags.add('health');
-    this._validTags.add('inventions');
+    this._validTags.add("technology");
+    this._validTags.add("software");
+    this._validTags.add("business");
+    this._validTags.add("education");
+    this._validTags.add("health");
+    this._validTags.add("inventions");
+  }
+
+  async getIdeas() {
+    try {
+      const res = await IdeasAPI.getIdeas();
+      this._ideas = res.data.data;
+      this.render();
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   getTagClass(tag) {
     tag = tag.toLowerCase();
-    let tagClass = '';
+    let tagClass = "";
+
     if (this._validTags.has(tag)) {
       tagClass = `tag-${tag}`;
     } else {
-      tagClass = '';
+      tagClass = "";
     }
     return tagClass;
   }
