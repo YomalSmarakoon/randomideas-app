@@ -1,7 +1,6 @@
 class IdeaFrom {
   constructor() {
     this._ideaFromModalEl = document.querySelector("#form-modal");
-    // this.addEventListeners();
   }
 
   addEventListeners() {
