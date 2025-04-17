@@ -6,6 +6,15 @@ import "@fortawesome/fontawesome-free/css/all.css";
 
 Modal.addEventListeners();
 
+/* 
+const ideaList = new IdeaList();
+const ideaFrom = new IdeaFrom(ideaList);
+ideaList.setIdeaForm(ideaFrom);
+
+ manually wiring dependencies together in index.js, which is a very typical thing in JavaScript. 
+ It's not wrong, but can get messy and tight-coupled as the app grows.
+ */
+
 const ideaList = new IdeaList();
 
 const ideaFrom = new IdeaFrom(ideaList);
