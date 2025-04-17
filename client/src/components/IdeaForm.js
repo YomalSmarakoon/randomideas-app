@@ -2,9 +2,20 @@ import IdeasAPI from "../services/ideasApi";
 import IdeaList from "./IdeaList";
 
 class IdeaFrom {
-  constructor() {
+  constructor(ideaListInstance) {
     this._ideaFromModalEl = document.querySelector("#form-modal");
-    this._ideaList = new IdeaList();
+    this._ideaList = ideaListInstance;
+    this._editingIdea = null;
+  }
+
+  setEditMode(idea) {
+    this._editingIdea = idea;
+    this.render();
+  }
+
+  resetFormState() {
+    this._editingIdea = null;
+    this.render();
   }
 
   addEventListeners() {
@@ -13,6 +24,7 @@ class IdeaFrom {
 
   onSubmitForm(e) {
     e.preventDefault();
+    const isEditMode = this._editingIdea != null;
 
     if (
       !this._form.elements.text.value ||
@@ -32,7 +44,11 @@ class IdeaFrom {
       username: this._form.elements.username.value,
     };
 
-    this.addIdea(idea);
+    if (isEditMode) {
+      this.editIdea(this._editingIdea._id, idea);
+    } else {
+      this.addIdea(idea);
+    }
 
     // clear form
     this._form.elements.text.value = "";
@@ -42,6 +58,17 @@ class IdeaFrom {
     this.render();
 
     document.dispatchEvent(new Event("closemodal"));
+  }
+
+  async editIdea(id, idea) {
+    try {
+      const res = await IdeasAPI.updateIdea(id, idea);
+
+      // update the edited idea in the list
+      this._ideaList.updateIdeaInList(res.data.data);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async addIdea(idea) {
@@ -56,6 +83,8 @@ class IdeaFrom {
   }
 
   render() {
+    const isEditMode = this._editingIdea != null;
+
     this._ideaFromModalEl.innerHTML = `
     <form id="idea-form">
     <div class="form-control">
@@ -66,11 +95,15 @@ class IdeaFrom {
     </div>
     <div class="form-control">
       <label for="idea-text">What's Your Idea?</label>
-      <textarea name="text" id="idea-text"></textarea>
+      <textarea name="text" id="idea-text">${
+        isEditMode ? this._editingIdea.text : ""
+      }</textarea>
     </div>
     <div class="form-control">
       <label for="tag">Tag</label>
-      <input type="text" name="tag" id="tag" />
+      <input type="text" name="tag" id="tag" value="${
+        isEditMode ? this._editingIdea.tag : ""
+      }"/>
     </div>
     <button class="btn" type="submit" id="submit">Submit</button>
   </form>

@@ -162,9 +162,27 @@ form label {
   border: none;
 }
 
+.edit {
+  position: absolute;
+  top: 12px;
+  right: 40px;
+  /* left: 14px; */
+  font-size: 15px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  /* color: darkblue; */
+  color: blueviolet;
+}
+
 .delete:hover {
   color: #000;
 }
+
+.edit:hover {
+  color: #000;
+}
+
 
 .date {
   color: #999;

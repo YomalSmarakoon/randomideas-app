@@ -1,10 +1,14 @@
 import IdeasAPI from "../services/ideasApi";
+import Modal from "./Modal";
+import IdeaFrom from "./IdeaForm";
 
 class IdeaList {
   constructor() {
     this._ideaListEl = document.querySelector("#idea-list");
     this._ideas = [];
     this.getIdeas();
+
+    this._ideaForm = null;
 
     this._validTags = new Set();
     this._validTags.add("technology");
@@ -15,6 +19,10 @@ class IdeaList {
     this._validTags.add("inventions");
   }
 
+  setIdeaForm(formInstance) {
+    this._ideaForm = formInstance;
+  }
+
   addEventListeners() {
     this._ideaListEl.addEventListener("click", (e) => {
       if (e.target.classList.contains("fa-times")) {
@@ -22,13 +30,25 @@ class IdeaList {
         const ideaId = e.target.parentElement.parentElement.dataset.id;
         this.deleteIdea(ideaId);
       }
+      if (e.target.classList.contains("fa-pencil")) {
+        e.stopImmediatePropagation();
+        const ideaId = e.target.parentElement.parentElement.dataset.id;
+        this.onEditIdea(ideaId);
+      }
     });
+  }
+
+  onEditIdea(ideaId) {
+    const idea = this._ideas.find((i) => i._id === ideaId);
+    if (!idea) return;
+
+    this._ideaForm.setEditMode(idea);
+    Modal.onOpenModal();
   }
 
   async deleteIdea(ideaId) {
     try {
       // Delete from server
-      console.log(ideaId);
       const res = await IdeasAPI.deleteIdea(ideaId);
       this._ideas.filter((idea) => idea._id !== ideaId);
       this.getIdeas();
@@ -64,17 +84,29 @@ class IdeaList {
     return tagClass;
   }
 
+  updateIdeaInList(updatedIdea) {
+    const index = this._ideas.findIndex((idea) => idea._id === updatedIdea._id);
+    if (index !== -1) {
+      this._ideas[index] = updatedIdea;
+      this.render();
+    }
+  }
+
   render() {
     this._ideaListEl.innerHTML = this._ideas
       .map((idea) => {
         const tagClass = this.getTagClass(idea.tag);
-        const deleteBtn =
-          idea.username === localStorage.getItem("username")
-            ? `<button class="delete"><i class="fas fa-times"></i></button>`
-            : "";
+        const isAuthor = idea.username === localStorage.getItem("username");
+        const deleteBtn = isAuthor
+          ? `<button class="delete"><i class="fas fa-times"></i></button>`
+          : "";
+        const editBtn = isAuthor
+          ? `<button class="edit"><i class="fas fa-pencil"></i></button>`
+          : "";
         return `
         <div class="card" data-id="${idea._id}">
         ${deleteBtn}
+        ${editBtn}
           <h3>
             ${idea.text}
           </h3>

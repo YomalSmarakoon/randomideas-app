@@ -1,3 +1,4 @@
+import IdeaFrom from "./IdeaForm";
 class Modal {
   constructor() {
     this._modalBtnEl = document.getElementById("modal-btn");
@@ -22,8 +23,9 @@ class Modal {
   outSideClick(e) {
     if (e.target === this._modalEl) {
       this.onCloseModal();
+      document.dispatchEvent(new Event("closemodal"));
     }
   }
 }
 
-export default Modal;
+export default new Modal();
